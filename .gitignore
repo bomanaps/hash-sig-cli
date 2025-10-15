@@ -1,0 +1,27 @@
+# Rust
+/target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# Local hash-sig clone (not needed anymore with git dependency)
+hash-sig/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Generated keys (for safety)
+generated_keys/
+*.json
+*.key
+*.pub
+*.sig
+
+# OS
+.DS_Store
+Thumbs.db
+
