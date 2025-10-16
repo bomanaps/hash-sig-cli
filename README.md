@@ -22,7 +22,10 @@ cargo build --release
 Generate cryptographic key pairs for hash-based signatures:
 
 ```bash
-cargo run --release --bin hashsig -- --num-keys 5 --log-num-active-epochs 18 --output-dir ./generated_keys
+cargo run --release --bin hashsig -- generate \
+  --num-keys 5 \
+  --log-num-active-epochs 12 \
+  --output-dir ./generated_keys
 ```
 
 **Parameters:**
