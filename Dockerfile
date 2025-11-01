@@ -18,7 +18,7 @@ COPY . .
 RUN cargo build --release
 
 # Use a smaller base image for the final image
-FROM debian:buster-slim
+FROM debian:bookworm-slim
 
 # Copy the compiled binary from the builder stage
 COPY --from=builder /usr/src/hash-sig-cli/target/release/hashsig /usr/local/bin/hashsig
