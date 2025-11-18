@@ -180,8 +180,8 @@ fn create_validator_manifest(
             ))?;
         
         writeln!(manifest_file, "  - index: {}", i)?;
-        writeln!(manifest_file, "    public_key_file: {}", pubkey_hex)?;
-        writeln!(manifest_file, "    secret_key_file: validator_{}_sk.json", i)?;
+        writeln!(manifest_file, "    pubkey_hex: {}", pubkey_hex)?;
+        writeln!(manifest_file, "    privkey_file: validator_{}_sk.json", i)?;
         if i < num_validators - 1 {
             writeln!(manifest_file)?;
         }
