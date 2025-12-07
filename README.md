@@ -21,12 +21,23 @@ cargo build --release
 
 Generate validator key pairs for hash-based signatures:
 
+**Default format (index-based naming):**
 ```bash
 cargo run --release --bin hashsig -- generate \
   --num-validators 5 \
   --log-num-active-epochs 18 \
   --output-dir ./generated_keys \
   --export-format both
+```
+
+**New format (first-3 last-3 bytes naming):**
+```bash
+cargo run --release --bin hashsig -- generate \
+  --num-validators 5 \
+  --log-num-active-epochs 18 \
+  --output-dir ./generated_keys \
+  --export-format both \
+  --new-format
 ```
 
 **Parameters:**
@@ -37,8 +48,11 @@ cargo run --release --bin hashsig -- generate \
   - `both` (default): export **SSZ binaries** (`.ssz`) and **legacy JSON** (`.json`)
   - `ssz`: export **only** SSZ binaries (`.ssz`)
 - `--create-manifest`: Create a manifest file (optional, defaults to `true`)
+- `--new-format`: Use new naming format based on first-3 and last-3 bytes of public key (e.g., `validator-987678-de4578-pk.ssz`). When enabled, the manifest will not include the `index` field.
 
 **Output (default `--export-format both`):**
+
+**Default format (without `--new-format`):**
 The tool creates a directory with key pairs exported as **SSZ-encoded binary files** plus **legacy JSON**:
 ```
 generated_keys/
@@ -53,6 +67,26 @@ generated_keys/
 ├── validator_1_sk.json           # Secret key for validator 1 (legacy JSON)
 └── ...
 ```
+
+**New format (with `--new-format`):**
+When using `--new-format`, validators are named using the first-3 and last-3 bytes of the public key (hex-encoded):
+```
+generated_keys/
+├── validator-keys-manifest.yaml  # Manifest file (if --create-manifest is true)
+├── validator-987678-de4578-pk.ssz  # Public key (SSZ bytes)
+├── validator-987678-de4578-sk.ssz  # Secret key (SSZ bytes)
+├── validator-987678-de4578-pk.json # Public key (legacy JSON)
+├── validator-987678-de4578-sk.json # Secret key (legacy JSON)
+├── validator-52d9eb-dd0a4f-pk.ssz  # Public key (SSZ bytes)
+├── validator-52d9eb-dd0a4f-sk.ssz  # Secret key (SSZ bytes)
+├── validator-52d9eb-dd0a4f-pk.json # Public key (legacy JSON)
+├── validator-52d9eb-dd0a4f-sk.json # Secret key (legacy JSON)
+└── ...
+```
+
+**Manifest differences:**
+- **Default format**: Manifest includes an `index` field for each validator
+- **New format**: Manifest does **not** include the `index` field (only `pubkey_hex` and `privkey_file`)
 
 The `.ssz` files contain the **canonical SSZ serialization** (`to_bytes()`) of the underlying key types from `leanSig`, written directly as raw bytes (not JSON or hex).
 
