@@ -49,9 +49,9 @@ enum Commands {
         #[arg(long, default_value = "true")]
         create_manifest: bool,
 
-        /// Use new format: name validators with first-3 last-3 bytes of public key
+        /// Use distributed format: name validators with first-3 last-3 bytes of public key
         #[arg(long)]
-        new_format: bool,
+        distributed: bool,
     },
 }
 
@@ -65,14 +65,14 @@ fn main() -> std::io::Result<()> {
             output_dir,
             export_format,
             create_manifest,
-            new_format,
+            distributed,
         } => {
             let validator_info = generate_keys(
                 num_validators,
                 log_num_active_epochs,
                 export_format,
                 output_dir.clone(),
-                new_format,
+                distributed,
             )?;
             
             if create_manifest {
@@ -80,7 +80,7 @@ fn main() -> std::io::Result<()> {
                     &output_dir,
                     num_validators,
                     log_num_active_epochs,
-                    new_format,
+                    distributed,
                     &validator_info,
                 )?;
             }
@@ -100,7 +100,7 @@ fn generate_keys(
     log_num_active_epochs: usize,
     export_format: ExportFormat,
     output_dir: PathBuf,
-    new_format: bool,
+    distributed: bool,
 ) -> std::io::Result<Vec<ValidatorInfo>> {
     // Create the output directory if it doesn't exist
     fs::create_dir_all(&output_dir)?;
@@ -135,7 +135,7 @@ fn generate_keys(
         let pk_bytes = pk.to_bytes();
         
         // Determine key prefix based on format
-        let key_prefix = if new_format {
+        let key_prefix = if distributed {
             // Extract first 3 and last 3 bytes from pk_bytes
             if pk_bytes.len() < 3 {
                 return Err(std::io::Error::new(
@@ -202,7 +202,7 @@ fn create_validator_manifest(
     output_dir: &PathBuf,
     num_validators: usize,
     log_num_active_epochs: usize,
-    new_format: bool,
+    distributed: bool,
     validator_info: &[ValidatorInfo],
 ) -> std::io::Result<()> {
     println!("\n📄 Creating validator manifest...");
@@ -223,12 +223,12 @@ fn create_validator_manifest(
     writeln!(manifest_file, "validators:")?;
     
     for (i, info) in validator_info.iter().enumerate() {
-        if new_format {
-            // New format: no index field
+        if distributed {
+            // Distributed format: no index field
             writeln!(manifest_file, "  - pubkey_hex: {}", info.pubkey_hex)?;
             writeln!(manifest_file, "    privkey_file: {}", info.privkey_file)?;
         } else {
-            // Old format: include index field
+            // Indexed format: include index field
             writeln!(manifest_file, "  - index: {}", i)?;
             writeln!(manifest_file, "    pubkey_hex: {}", info.pubkey_hex)?;
             writeln!(manifest_file, "    privkey_file: {}", info.privkey_file)?;
